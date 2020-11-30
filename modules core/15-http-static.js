@@ -2,37 +2,31 @@
 
 const { inspector } = require('inspector')
 
-/*
-URl
-Este modulo dispone de utilidades para la resolucion y analisis de urls
-
-Query String
-Este modulo proporciona utilidades para hacer frente a las cadenas de consulta
-*/
-
-let http = require('http'),
+let
+	http = require('http'),
+	fs = require('fs'),
 	path = require('path'),
 	url = require('url'),
 	urls = [
 		{
 			id: 1,
 			route: '/',
-			output: '<h2>Home</h2>'
+			output: 'assets/index.html'
 		},
 		{
 			id: 2,
 			route: 'acerca',
-			output: '<h2>Acerca</h2>'
+			output: 'assets/acerca.html'
 		},
 		{
 			id: 3,
 			route: 'contacto',
-			output: '<h2>Contacto</h2>'
+			output: 'assets/contacto.html'
 		}
 	]
 
 	function webServer(req, res){
-		let message = '<h1>Progando escritura</h1>',
+		let
 			pathURL = path.basename(req.url),
 			id = url.parse( req.url, true ).query.id
 
@@ -40,7 +34,10 @@ let http = require('http'),
 			for (const pos of urls) {
 				if(pos.route == pathURL || pos.id == id){
 					res.writeHead(200, {'Content-Type': 'text/html'})
-					res.end(message + pos.output)
+					fs.readFile(pos.output, function(err, data){
+						if(err){ throw err }
+						res.end(data)
+					})
 				}
 			}
 			// url.forEach(pos => {
@@ -51,8 +48,10 @@ let http = require('http'),
 			// });
 			if(!res.finished){
 				res.writeHead(404, {'Content-Type': 'text/html'})
-				res.end('<h1>Lo que estas buscando no se encuentra aqui xd</h1>')
-
+				fs.readFile('assets/404.html', (err, data) =>{
+					if(err) throw err
+					res.end(data)
+				})
 			}
 	}
 
